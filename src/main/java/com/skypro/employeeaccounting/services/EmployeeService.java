@@ -44,7 +44,7 @@ public class EmployeeService {
         Employee newEmployee = Employee.builder().firstName(firstName).lastName(lastName).build();
 
         if (!employees.contains(newEmployee)) {
-            throw new EmployeeNotFoundException("An employee with that name and surname does not exist.");
+            throw new EmployeeNotFoundException("An employee with that name and surname does not exist!");
         } else {
             int index = employees.indexOf(newEmployee);
             return employees.get(index);
@@ -52,11 +52,6 @@ public class EmployeeService {
     }
 
     public List<Employee> printEmployee() {
-        if (employees.isEmpty()) {
-            System.out.println("<h1>Empty collection of workers<h1>");
-        } else {
-            return employees;
-        }
-        return Collections.emptyList();
+        return employees.isEmpty() ? Collections.emptyList() : employees;
     }
 }

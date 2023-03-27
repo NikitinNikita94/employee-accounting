@@ -52,11 +52,6 @@ public class EmployeeService {
     }
 
     public List<Employee> printEmployee() {
-        if (employees.isEmpty()) {
-            System.out.println("<h1>Empty collection of workers<h1>");
-        } else {
-            return employees;
-        }
-        return Collections.emptyList();
+        return employees.isEmpty() ? Collections.emptyList() : employees;
     }
 }

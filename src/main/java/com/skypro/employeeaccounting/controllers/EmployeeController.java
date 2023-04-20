@@ -8,31 +8,34 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
-@RequestMapping("/departments")
+@RequestMapping("/employee")
 public class EmployeeController {
+
     @Autowired
     private EmployeeService service;
 
-    @GetMapping("/max-salary")
+    @GetMapping("/add")
     @ResponseStatus(code = HttpStatus.ACCEPTED)
-    public Employee getDepartmentMaxSalaryEmployee(@RequestParam("departmentId") Integer departmentId) {
-        return service.getDepartmentMaxSalaryEmployee(departmentId);
+    public Employee add(@RequestParam("name") String name, @RequestParam("salary") Integer salary, @RequestParam("dept") Integer dept) {
+        return service.addEmployee(name, salary, dept);
     }
 
-    @GetMapping("/min-salary")
-    @ResponseStatus(code = HttpStatus.ACCEPTED)
-    public Employee getDepartmentMixSalaryEmployee(@RequestParam("departmentId") Integer departmentId) {
-        return service.getDepartmentMinSalaryEmployee(departmentId);
+    @GetMapping("/remove")
+    @ResponseStatus(code = HttpStatus.OK)
+    public Employee remove(@RequestParam("name") String name, @RequestParam("salary") Integer salary, @RequestParam("dept") Integer dept) {
+        return service.removeEmployee(name, salary, dept);
     }
 
-    @GetMapping("/all")
-    @ResponseStatus(code = HttpStatus.ACCEPTED)
-    public List<Employee> getAllEmployeeByDep(@RequestParam(value = "departmentId", required = false) Integer departmentId) {
-        if (departmentId == null) {
-            return service.getAllEmployee();
-        } else {
-            return service.getAllEmployeeByDep(departmentId);
-        }
+    @GetMapping("/find")
+    @ResponseStatus(code = HttpStatus.FOUND)
+    public Employee find(@RequestParam("name") String name, @RequestParam("salary") Integer salary, @RequestParam("dept") Integer dept) {
+        return service.findEmployee(name, salary, dept);
+    }
+
+    @GetMapping("/print_employee")
+    public List<Employee> printEmployee() {
+        return service.printEmployee();
     }
 }

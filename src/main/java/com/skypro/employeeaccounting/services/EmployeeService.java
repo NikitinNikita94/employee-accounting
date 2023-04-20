@@ -1,9 +1,12 @@
 package com.skypro.employeeaccounting.services;
 
+import com.skypro.employeeaccounting.ecxeptions.EmployeeAlreadyAddedException;
+import com.skypro.employeeaccounting.ecxeptions.EmployeeNotFoundException;
+import com.skypro.employeeaccounting.ecxeptions.EmployeeStorageIsFullException;
 import com.skypro.employeeaccounting.entity.Employee;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,41 +14,46 @@ import java.util.Map;
 @Service
 public class EmployeeService {
 
-    Map<String, Employee> employeeMap = new HashMap<>();
+    private static int CAPACITY = 4;
+    static Map<String, Employee> employeeMap = new HashMap<>(CAPACITY);
 
-    {
-        Employee firstEmploy = Employee.builder().name("Mad Max").salary(20000).department(5).build();
-        Employee secondEmploy = Employee.builder().name("Din Jarin").salary(25000).department(5).build();
-        Employee threeEmploy = Employee.builder().name("Joni Sins").salary(30000).department(5).build();
-        Employee fourEmploy = Employee.builder().name("EMINEM").salary(60000).department(3).build();
-        employeeMap.put(firstEmploy.getName(), firstEmploy);
-        employeeMap.put(secondEmploy.getName(), secondEmploy);
-        employeeMap.put(threeEmploy.getName(), threeEmploy);
-        employeeMap.put(fourEmploy.getName(), fourEmploy);
+    public Employee addEmployee(final String name, final int salary, final int department) {
+        Employee newEmployee = Employee.builder().name(name).salary(salary).department(department).build();
+
+        if (employeeMap.size() > 4) {
+            throw new EmployeeStorageIsFullException("You have exceeded the size of the Map.");
+        }
+
+        if (!employeeMap.containsValue(newEmployee)) {
+            employeeMap.put(newEmployee.getName(), newEmployee);
+            return newEmployee;
+        } else {
+            throw new EmployeeAlreadyAddedException("An employee with the name already exists.");
+        }
     }
 
+    public Employee removeEmployee(final String name, final int salary, final int department) {
+        Employee newEmployee = Employee.builder().name(name).salary(salary).department(department).build();
 
-    public Employee getDepartmentMaxSalaryEmployee(final Integer depId) {
-        return employeeMap.values().stream()
-                .filter(employee -> employee.getDepartment().equals(depId))
-                .max(Comparator.comparing(Employee::getSalary))
-                .orElseThrow(() -> new RuntimeException("No such deportation number exists"));
+        if (!employeeMap.containsValue(newEmployee)) {
+            throw new EmployeeNotFoundException("An employee with that name  does not exist.");
+        } else {
+            employeeMap.remove(newEmployee.getName());
+            return newEmployee;
+        }
     }
 
-    public Employee getDepartmentMinSalaryEmployee(final Integer depId) {
-        return employeeMap.values().stream()
-                .filter(employee -> employee.getDepartment().equals(depId))
-                .min(Comparator.comparing(Employee::getSalary))
-                .orElseThrow(() -> new RuntimeException("No such deportation number exists"));
+    public Employee findEmployee(final String name, final int salary, final int department) {
+        Employee newEmployee = Employee.builder().name(name).salary(salary).department(department).build();
+
+        if (!employeeMap.containsValue(newEmployee)) {
+            throw new EmployeeNotFoundException("An employee with that name does not exist.");
+        } else {
+            return employeeMap.get(newEmployee.getName());
+        }
     }
 
-    public List<Employee> getAllEmployeeByDep(final Integer depId) {
-        return employeeMap.values().stream()
-                .filter(employee -> employee.getDepartment().equals(depId))
-                .toList();
-    }
-
-    public List<Employee> getAllEmployee() {
-        return employeeMap.values().stream().toList();
+    public List<Employee> printEmployee() {
+        return employeeMap.isEmpty() ? Collections.emptyList() : employeeMap.values().stream().toList();
     }
 }

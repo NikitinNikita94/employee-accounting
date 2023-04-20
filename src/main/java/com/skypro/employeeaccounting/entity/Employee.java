@@ -10,6 +10,9 @@ import lombok.ToString;
 @Getter
 @EqualsAndHashCode
 public class Employee {
-    private String firstName;
-    private String lastName;
+    private String name;
+
+    private Integer salary;
+
+    private Integer department;
 }

@@ -9,31 +9,30 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/employee")
+@RequestMapping("/departments")
 public class EmployeeController {
     @Autowired
     private EmployeeService service;
 
-    @GetMapping("/add")
+    @GetMapping("/max-salary")
     @ResponseStatus(code = HttpStatus.ACCEPTED)
-    public Employee add(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
-        return service.addEmployee(firstName,lastName);
+    public Employee getDepartmentMaxSalaryEmployee(@RequestParam("departmentId") Integer departmentId) {
+        return service.getDepartmentMaxSalaryEmployee(departmentId);
     }
 
-    @GetMapping("/remove")
-    @ResponseStatus(code = HttpStatus.OK)
-    public Employee remove(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
-        return service.removeEmployee(firstName,lastName);
+    @GetMapping("/min-salary")
+    @ResponseStatus(code = HttpStatus.ACCEPTED)
+    public Employee getDepartmentMixSalaryEmployee(@RequestParam("departmentId") Integer departmentId) {
+        return service.getDepartmentMinSalaryEmployee(departmentId);
     }
 
-    @GetMapping("/find")
-    @ResponseStatus(code = HttpStatus.FOUND)
-    public Employee find(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
-        return service.findEmployee(firstName,lastName);
-    }
-
-    @GetMapping("/print_employee")
-    public List<Employee> printEmployee() {
-        return service.printEmployee();
+    @GetMapping("/all")
+    @ResponseStatus(code = HttpStatus.ACCEPTED)
+    public List<Employee> getAllEmployeeByDep(@RequestParam(value = "departmentId", required = false) Integer departmentId) {
+        if (departmentId == null) {
+            return service.getAllEmployee();
+        } else {
+            return service.getAllEmployeeByDep(departmentId);
+        }
     }
 }

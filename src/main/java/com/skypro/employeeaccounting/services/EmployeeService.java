@@ -1,57 +1,51 @@
 package com.skypro.employeeaccounting.services;
 
-import com.skypro.employeeaccounting.ecxeptions.EmployeeAlreadyAddedException;
-import com.skypro.employeeaccounting.ecxeptions.EmployeeNotFoundException;
-import com.skypro.employeeaccounting.ecxeptions.EmployeeStorageIsFullException;
 import com.skypro.employeeaccounting.entity.Employee;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmployeeService {
-    private ArrayList<Employee> employees = new ArrayList<>(4);
 
-    public Employee addEmployee(final String firstName, final String lastName) {
-        Employee newEmployee = Employee.builder().firstName(firstName).lastName(lastName).build();
+    Map<String, Employee> employeeMap = new HashMap<>();
 
-        if (employees.size() > 4) {
-            throw new EmployeeStorageIsFullException("You have exceeded the size of the array.");
-        }
-
-        if (!employees.contains(newEmployee)) {
-            employees.add(newEmployee);
-            return newEmployee;
-        } else {
-            throw new EmployeeAlreadyAddedException("An employee with the same first and last name already exists.");
-        }
+    {
+        Employee firstEmploy = Employee.builder().name("Mad Max").salary(20000).department(5).build();
+        Employee secondEmploy = Employee.builder().name("Din Jarin").salary(25000).department(5).build();
+        Employee threeEmploy = Employee.builder().name("Joni Sins").salary(30000).department(5).build();
+        Employee fourEmploy = Employee.builder().name("EMINEM").salary(60000).department(3).build();
+        employeeMap.put(firstEmploy.getName(), firstEmploy);
+        employeeMap.put(secondEmploy.getName(), secondEmploy);
+        employeeMap.put(threeEmploy.getName(), threeEmploy);
+        employeeMap.put(fourEmploy.getName(), fourEmploy);
     }
 
-    public Employee removeEmployee(final String firstName, final String lastName) {
-        Employee newEmployee = Employee.builder().firstName(firstName).lastName(lastName).build();
 
-        if (!employees.contains(newEmployee)) {
-            throw new EmployeeNotFoundException("An employee with that name and surname does not exist.");
-        } else {
-            employees.remove(newEmployee);
-            return newEmployee;
-        }
+    public Employee getDepartmentMaxSalaryEmployee(final Integer depId) {
+        return employeeMap.values().stream()
+                .filter(employee -> employee.getDepartment().equals(depId))
+                .max(Comparator.comparing(Employee::getSalary))
+                .orElseThrow(() -> new RuntimeException("No such deportation number exists"));
     }
 
-    public Employee findEmployee(final String firstName, final String lastName) {
-        Employee newEmployee = Employee.builder().firstName(firstName).lastName(lastName).build();
-
-        if (!employees.contains(newEmployee)) {
-            throw new EmployeeNotFoundException("An employee with that name and surname does not exist!");
-        } else {
-            int index = employees.indexOf(newEmployee);
-            return employees.get(index);
-        }
+    public Employee getDepartmentMinSalaryEmployee(final Integer depId) {
+        return employeeMap.values().stream()
+                .filter(employee -> employee.getDepartment().equals(depId))
+                .min(Comparator.comparing(Employee::getSalary))
+                .orElseThrow(() -> new RuntimeException("No such deportation number exists"));
     }
 
-    public List<Employee> printEmployee() {
-        return employees.isEmpty() ? Collections.emptyList() : employees;
+    public List<Employee> getAllEmployeeByDep(final Integer depId) {
+        return employeeMap.values().stream()
+                .filter(employee -> employee.getDepartment().equals(depId))
+                .toList();
+    }
+
+    public List<Employee> getAllEmployee() {
+        return employeeMap.values().stream().toList();
     }
 }

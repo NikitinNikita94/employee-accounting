@@ -60,9 +60,9 @@ public class EmployeeService {
     }
 
     private String checkEmployeeName(final String name) {
-        if (StringUtils.isAlphanumeric(name) || StringUtils.isEmpty(name)) {
+        if (!StringUtils.isAlpha(name)) {
             throw new EmployeeNameException("Invalid username entered.");
         }
-        return StringUtils.capitalize(StringUtils.deleteWhitespace(name));
+        return StringUtils.capitalize(StringUtils.deleteWhitespace(name.toLowerCase()));
     }
 }

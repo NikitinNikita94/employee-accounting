@@ -1,9 +1,11 @@
 package com.skypro.employeeaccounting.services;
 
 import com.skypro.employeeaccounting.ecxeptions.EmployeeAlreadyAddedException;
+import com.skypro.employeeaccounting.ecxeptions.EmployeeNameException;
 import com.skypro.employeeaccounting.ecxeptions.EmployeeNotFoundException;
 import com.skypro.employeeaccounting.ecxeptions.EmployeeStorageIsFullException;
 import com.skypro.employeeaccounting.entity.Employee;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -18,7 +20,7 @@ public class EmployeeService {
     static Map<String, Employee> employeeMap = new HashMap<>(CAPACITY);
 
     public Employee addEmployee(final String name, final int salary, final int department) {
-        Employee newEmployee = Employee.builder().name(name).salary(salary).department(department).build();
+        Employee newEmployee = Employee.builder().name(checkEmployeeName(name)).salary(salary).department(department).build();
 
         if (employeeMap.size() > 4) {
             throw new EmployeeStorageIsFullException("You have exceeded the size of the Map.");
@@ -33,7 +35,7 @@ public class EmployeeService {
     }
 
     public Employee removeEmployee(final String name, final int salary, final int department) {
-        Employee newEmployee = Employee.builder().name(name).salary(salary).department(department).build();
+        Employee newEmployee = Employee.builder().name(checkEmployeeName(name)).salary(salary).department(department).build();
 
         if (!employeeMap.containsValue(newEmployee)) {
             throw new EmployeeNotFoundException("An employee with that name  does not exist.");
@@ -44,7 +46,7 @@ public class EmployeeService {
     }
 
     public Employee findEmployee(final String name, final int salary, final int department) {
-        Employee newEmployee = Employee.builder().name(name).salary(salary).department(department).build();
+        Employee newEmployee = Employee.builder().name(checkEmployeeName(name)).salary(salary).department(department).build();
 
         if (!employeeMap.containsValue(newEmployee)) {
             throw new EmployeeNotFoundException("An employee with that name does not exist.");
@@ -55,5 +57,12 @@ public class EmployeeService {
 
     public List<Employee> printEmployee() {
         return employeeMap.isEmpty() ? Collections.emptyList() : employeeMap.values().stream().toList();
+    }
+
+    private String checkEmployeeName(final String name) {
+        if (StringUtils.isAlphanumeric(name) || StringUtils.isEmpty(name)) {
+            throw new EmployeeNameException("Invalid username entered.");
+        }
+        return StringUtils.capitalize(StringUtils.deleteWhitespace(name));
     }
 }

@@ -8,55 +8,50 @@ import com.skypro.employeeaccounting.entity.Employee;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class EmployeeService {
 
-    private static int CAPACITY = 4;
-    static Map<String, Employee> employeeMap = new HashMap<>(CAPACITY);
+    private static int CAPACITY = 6;
+    private final List<Employee> employees = new ArrayList<>();
 
     public Employee addEmployee(final String name, final int salary, final int department) {
         Employee newEmployee = Employee.builder().name(checkEmployeeName(name)).salary(salary).department(department).build();
 
-        if (employeeMap.size() > 4) {
-            throw new EmployeeStorageIsFullException("You have exceeded the size of the Map.");
+        if (employees.size() > CAPACITY) {
+            throw new EmployeeStorageIsFullException("You have exceeded the size.");
         }
 
-        if (!employeeMap.containsValue(newEmployee)) {
-            employeeMap.put(newEmployee.getName(), newEmployee);
+        if (!employees.contains(newEmployee)) {
+            employees.add(newEmployee);
             return newEmployee;
         } else {
             throw new EmployeeAlreadyAddedException("An employee with the name already exists.");
         }
     }
 
-    public Employee removeEmployee(final String name, final int salary, final int department) {
-        Employee newEmployee = Employee.builder().name(checkEmployeeName(name)).salary(salary).department(department).build();
+    public Employee removeEmployee(final String name, final int department) {
+        Employee newEmployee = employees.stream()
+                .filter(e -> e.getName().equals(name) && e.getDepartment().equals(department))
+                .findFirst()
+                .orElseThrow(() -> new EmployeeNotFoundException("An employee with that name  does not exist."));
 
-        if (!employeeMap.containsValue(newEmployee)) {
-            throw new EmployeeNotFoundException("An employee with that name  does not exist.");
-        } else {
-            employeeMap.remove(newEmployee.getName());
-            return newEmployee;
-        }
+        employees.remove(newEmployee);
+        return newEmployee;
     }
 
     public Employee findEmployee(final String name, final int salary, final int department) {
         Employee newEmployee = Employee.builder().name(checkEmployeeName(name)).salary(salary).department(department).build();
 
-        if (!employeeMap.containsValue(newEmployee)) {
-            throw new EmployeeNotFoundException("An employee with that name does not exist.");
-        } else {
-            return employeeMap.get(newEmployee.getName());
-        }
+        return employees.stream()
+                .filter(employee -> employee.equals(newEmployee))
+                .findFirst()
+                .orElseThrow(() -> new EmployeeNotFoundException("employee not found!"));
     }
 
-    public List<Employee> printEmployee() {
-        return employeeMap.isEmpty() ? Collections.emptyList() : employeeMap.values().stream().toList();
+    public List<Employee> getAll() {
+        return employees.isEmpty() ? Collections.emptyList() : new ArrayList<>(employees);
     }
 
     private String checkEmployeeName(final String name) {

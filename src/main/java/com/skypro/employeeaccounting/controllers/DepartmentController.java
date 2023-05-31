@@ -7,32 +7,41 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/departments")
+@RequestMapping("/department")
 public class DepartmentController {
     @Autowired
     private DepartmentService service;
 
-    @GetMapping("/max-salary")
+    @GetMapping("/{id}/salary/max")
     @ResponseStatus(code = HttpStatus.ACCEPTED)
-    public Employee getDepartmentMaxSalaryEmployee(@RequestParam("departmentId") Integer departmentId) {
-        return service.getDepartmentMaxSalaryEmployee(departmentId);
+    public Integer getDepartmentMaxSalaryDepart(@PathVariable int id) {
+        return service.getDepartmentMaxSalary(id);
     }
 
-    @GetMapping("/min-salary")
+    @GetMapping("/{id}/salary/min")
     @ResponseStatus(code = HttpStatus.ACCEPTED)
-    public Employee getDepartmentMixSalaryEmployee(@RequestParam("departmentId") Integer departmentId) {
-        return service.getDepartmentMinSalaryEmployee(departmentId);
+    public Integer getDepartmentMinSalaryDepart(@PathVariable int id) {
+        return service.getDepartmentMinSalary(id);
     }
 
-    @GetMapping("/all")
+    @GetMapping("/{id}/salary/sum")
     @ResponseStatus(code = HttpStatus.ACCEPTED)
-    public List<Employee> getAllEmployeeByDep(@RequestParam(value = "departmentId", required = false) Integer departmentId) {
-        if (departmentId == null) {
-            return service.getAllEmployee();
-        } else {
-            return service.getAllEmployeeByDep(departmentId);
-        }
+    public Integer getDepartmentSumBySalaryDepart(@PathVariable int id) {
+        return service.getDepartmentSumBySalaryDepart(id);
+    }
+
+    @GetMapping("/{id}/employees")
+    @ResponseStatus(code = HttpStatus.ACCEPTED)
+    public List<Employee> getAllEmployeeByDepart(@RequestParam(value = "departmentId", required = false) Integer departmentId, @PathVariable String id) {
+        return service.getAllEmployeeByDepart(departmentId);
+    }
+
+    @GetMapping("/{id}/employees")
+    @ResponseStatus(code = HttpStatus.ACCEPTED)
+    public Map<Integer, List<Employee>> getAllEmployeeByDepart() {
+        return service.getAllEmployeeDepart();
     }
 }

@@ -1,37 +1,55 @@
 package com.skypro.employeeaccounting.services;
 
+import com.skypro.employeeaccounting.ecxeptions.DepartmentNotFoundException;
+import com.skypro.employeeaccounting.ecxeptions.EmployeeNotFoundException;
 import com.skypro.employeeaccounting.entity.Employee;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import static com.skypro.employeeaccounting.services.EmployeeService.employeeMap;
 
 @Service
 public class DepartmentService {
 
-    public Employee getDepartmentMaxSalaryEmployee(final Integer depId) {
-        return employeeMap.values().stream()
-                .filter(employee -> employee.getDepartment().equals(depId))
-                .max(Comparator.comparing(Employee::getSalary))
-                .orElseThrow(() -> new RuntimeException("No such deportation number exists"));
+    private final EmployeeService employeeService;
+
+    public DepartmentService(EmployeeService employeeService) {
+        this.employeeService = employeeService;
     }
 
-    public Employee getDepartmentMinSalaryEmployee(final Integer depId) {
-        return employeeMap.values().stream()
-                .filter(employee -> employee.getDepartment().equals(depId))
-                .min(Comparator.comparing(Employee::getSalary))
-                .orElseThrow(() -> new RuntimeException("No such deportation number exists"));
+    public Integer getDepartmentMaxSalary(final int depId) {
+        return employeeService.getAll().stream()
+                .filter(employee -> employee.getDepartment() == depId)
+                .map(Employee::getSalary)
+                .max(Integer::compareTo)
+                .orElseThrow(DepartmentNotFoundException::new);
     }
 
-    public List<Employee> getAllEmployeeByDep(final Integer depId) {
-        return employeeMap.values().stream()
-                .filter(employee -> employee.getDepartment().equals(depId))
+    public Integer getDepartmentMinSalary(final int depId) {
+        return employeeService.getAll().stream()
+                .filter(employee -> employee.getDepartment() == depId)
+                .map(Employee::getSalary)
+                .min(Integer::compareTo)
+                .orElseThrow(DepartmentNotFoundException::new);
+    }
+
+    public Integer getDepartmentSumBySalaryDepart(final int depId) {
+        return employeeService.getAll().stream()
+                .filter(employee -> employee.getDepartment() == depId)
+                .mapToInt(Employee::getSalary)
+                .sum();
+    }
+
+    public List<Employee> getAllEmployeeByDepart(final int depId) {
+        return employeeService.getAll().stream()
+                .filter(employee -> employee.getDepartment() == depId)
                 .toList();
     }
 
-    public List<Employee> getAllEmployee() {
-        return employeeMap.values().stream().toList();
+    public Map<Integer, List<Employee>> getAllEmployeeDepart() {
+        return employeeService.getAll().stream().collect(Collectors.groupingBy(Employee::getDepartment));
     }
 }

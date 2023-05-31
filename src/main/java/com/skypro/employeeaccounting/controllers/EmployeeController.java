@@ -24,8 +24,8 @@ public class EmployeeController {
 
     @GetMapping("/remove")
     @ResponseStatus(code = HttpStatus.OK)
-    public Employee remove(@RequestParam("name") String name, @RequestParam("salary") Integer salary, @RequestParam("dept") Integer dept) {
-        return service.removeEmployee(name, salary, dept);
+    public Employee remove(@RequestParam("name") String name, @RequestParam("dept") Integer dept) {
+        return service.removeEmployee(name, dept);
     }
 
     @GetMapping("/find")
@@ -36,6 +36,6 @@ public class EmployeeController {
 
     @GetMapping("/print_employee")
     public List<Employee> printEmployee() {
-        return service.printEmployee();
+        return service.getAll();
     }
 }
